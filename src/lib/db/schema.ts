@@ -1,16 +1,34 @@
-import { pgEnum, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { index, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 
 export const userRoleEnum = pgEnum("user_role", ["member", "superuser"]);
 export const microdosisStateEnum = pgEnum("microdosis_state", ["propuesta", "en_estudio", "realizada"]);
 
+/** No passwords: access is granted by emailing a one-time link (magic link). */
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   email: text("email").notNull().unique(),
   name: text("name").notNull(),
-  passwordHash: text("password_hash").notNull(),
   role: userRoleEnum("role").notNull().default("member"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/**
+ * One-time access tokens. Only the SHA-256 digest is stored, so a database
+ * dump cannot be replayed as a login link. A row is consumed atomically
+ * (`used_at` set) on the first visit.
+ */
+export const magicLinks = pgTable(
+  "magic_links",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    email: text("email").notNull(),
+    tokenHash: text("token_hash").notNull().unique(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    usedAt: timestamp("used_at", { withTimezone: true }),
+  },
+  (t) => [index("magic_links_email_idx").on(t.email)],
+);
 
 export const microdosis = pgTable("microdosis", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -41,6 +59,7 @@ export const votes = pgTable(
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+export type MagicLink = typeof magicLinks.$inferSelect;
 export type Microdosis = typeof microdosis.$inferSelect;
 export type NewMicrodosis = typeof microdosis.$inferInsert;
 export type Vote = typeof votes.$inferSelect;

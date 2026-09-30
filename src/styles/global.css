@@ -406,6 +406,11 @@ textarea {
   color: var(--danger);
 }
 
+.notice-warn {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+
 .empty {
   background: var(--surface);
   border: 1px dashed var(--line);
@@ -413,6 +418,57 @@ textarea {
   padding: 1.5rem;
   color: var(--muted);
   text-align: center;
+}
+
+/* ---------- people table (admin) ---------- */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+  font-size: 0.93rem;
+  box-shadow: var(--shadow);
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.table th {
+  background: var(--neutral-bg);
+  font-size: 0.85rem;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table .role {
+  white-space: nowrap;
+}
+
+.table-actions {
+  text-align: right;
+  width: 1%;
+}
+
+.table-actions form {
+  display: inline;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 /* ---------- footer ---------- */

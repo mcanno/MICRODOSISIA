@@ -1,50 +1,56 @@
 ---
 import Layout from "@/components/Layout.astro";
-import { auth } from "@/lib/auth";
 
 if (Astro.locals.user) return Astro.redirect("/");
 
-// Auth.js validates the CSRF token on the POST below, so we fetch one first
-// and forward the cookies it sets to the browser.
-const csrfResponse = await auth(
-  new Request(new URL("/api/auth/csrf", Astro.url), {
-    headers: { cookie: Astro.request.headers.get("cookie") ?? "" },
-  }),
-);
-const { csrfToken } = (await csrfResponse.json()) as { csrfToken: string };
-const setCookies =
-  typeof csrfResponse.headers.getSetCookie === "function" ? csrfResponse.headers.getSetCookie() : [];
-for (const value of setCookies) Astro.response.headers.append("Set-Cookie", value);
-
 const errorCode = Astro.url.searchParams.get("error");
 const messages: Record<string, string> = {
-  CredentialsSignin: "Email o contraseña incorrectos.",
-  Configuration: "Error de configuración: falta AUTH_SECRET o DATABASE_URL.",
-  AccessDenied: "No tienes permiso para entrar.",
+  email: "Ese correo no tiene un formato válido.",
+  domain: "Solo se permite entrar con un correo @secot.org.",
+  unknown: "Ese correo no está dado de alta. Pídele a un superusuario que te añada a la lista.",
+  send: "No se ha podido enviar el correo. Inténtalo de nuevo en unos minutos.",
+  config: "Error de configuración: falta AUTH_SECRET o DATABASE_URL.",
+  expired: "El enlace no es válido, ya se ha usado o ha caducado. Pide uno nuevo.",
 };
 const error = errorCode ? (messages[errorCode] ?? `Error al iniciar sesión (${errorCode}).`) : null;
+
+const sent = Astro.url.searchParams.get("sent") === "1";
+// Only ever set by `/api/login` when the request came from this machine.
+const devLink = Astro.url.searchParams.get("link");
 ---
 
 <Layout title="Entrar">
   <h1>Identifícate</h1>
-  <p class="lede">Necesitas ser miembro de SECOT para proponer, votar y consultar microdosis.</p>
+  <p class="lede">
+    Escribe tu correo de SECOT y te enviamos un <strong>enlace de acceso</strong>.
+    No hay contraseñas.
+  </p>
 
   {error && <p class="notice notice-error" role="alert">{error}</p>}
 
-  <form class="form" method="post" action="/api/auth/callback/credentials">
-    <input type="hidden" name="csrfToken" value={csrfToken} />
-    <input type="hidden" name="callbackUrl" value="/" />
+  {sent && !error && (
+    <p class="notice notice-ok" role="status">
+      Si ese correo está en la lista, en unos segundos recibirás un enlace para entrar.
+      Caduca en 15 minutos y solo sirve una vez.
+    </p>
+  )}
 
+  {devLink && (
+    <p class="notice notice-warn" role="status">
+      <strong>Modo desarrollo:</strong> todavía no hay proveedor de correo, así que el
+      enlace no se ha enviado. Ábrelo aquí: <a href={devLink}>entrar en MICRODOSISIA</a>.
+    </p>
+  )}
+
+  <form class="form" method="post" action="/api/login">
     <label>
-      Email
-      <input type="email" name="email" autocomplete="email" required />
+      Correo SECOT
+      <input type="email" name="email" autocomplete="email" required placeholder="tu@secot.org" />
+      <span class="hint">
+        Solo dominio <strong>secot.org</strong>, y solo si un superusuario te ha dado de alta.
+      </span>
     </label>
 
-    <label>
-      Contraseña
-      <input type="password" name="password" autocomplete="current-password" required />
-    </label>
-
-    <button class="btn btn-primary" type="submit">Entrar</button>
+    <button class="btn btn-primary" type="submit">Enviar enlace de acceso</button>
   </form>
 </Layout>

@@ -1,6 +1,6 @@
-import { and, count, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq, gt, isNull } from "drizzle-orm";
 import { getDb } from "./index";
-import { microdosis, users, votes, type Microdosis } from "./schema";
+import { magicLinks, microdosis, users, votes, type Microdosis } from "./schema";
 import type { MicrodosisState } from "@/lib/states";
 
 /* ---------- users ---------- */
@@ -21,10 +21,25 @@ export async function findUserById(id: string) {
   return rows[0] ?? null;
 }
 
+export async function listUsers() {
+  const db = getDb();
+  return db.select().from(users).orderBy(users.createdAt);
+}
+
+/** Used to keep at least one superuser alive. */
+export async function countSuperusers(): Promise<number> {
+  const db = getDb();
+  const rows = await db
+    .select({ value: count() })
+    .from(users)
+    .where(eq(users.role, "superuser"));
+  return rows[0]?.value ?? 0;
+}
+
+/** Users are created by a superuser (`/admin`) or by the CLI bootstrap script. */
 export async function createUser(input: {
   email: string;
   name: string;
-  passwordHash: string;
   role?: "member" | "superuser";
 }) {
   const db = getDb();
@@ -33,6 +48,74 @@ export async function createUser(input: {
     .values({ ...input, email: input.email.trim().toLowerCase() })
     .returning();
   return rows[0];
+}
+
+/** Removes a user together with their magic links (votes disappear by cascade). */
+export async function deleteUser(id: string) {
+  const db = getDb();
+  const rows = await db.delete(users).where(eq(users.id, id)).returning();
+  const deleted = rows[0];
+  if (deleted) await deleteMagicLinks(deleted.email);
+  return deleted ?? null;
+}
+
+/* ---------- magic links ---------- */
+
+/** Replaces any outstanding link: at most one live token per address. */
+export async function insertMagicLink(input: {
+  email: string;
+  tokenHash: string;
+  expiresAt: Date;
+}) {
+  const db = getDb();
+  await db.delete(magicLinks).where(eq(magicLinks.email, input.email));
+  await db.insert(magicLinks).values(input);
+}
+
+/**
+ * Atomically consumes a token: only an unused, unexpired row updates, so the
+ * link works exactly once. Returns the address it belongs to.
+ */
+export async function consumeMagicLink(tokenHash: string): Promise<string | null> {
+  const db = getDb();
+  const now = new Date();
+  const rows = await db
+    .update(magicLinks)
+    .set({ usedAt: now })
+    .where(
+      and(
+        eq(magicLinks.tokenHash, tokenHash),
+        isNull(magicLinks.usedAt),
+        gt(magicLinks.expiresAt, now),
+      ),
+    )
+    .returning({ email: magicLinks.email });
+  return rows[0]?.email ?? null;
+}
+
+/** `true` when the address asked for a link less than `seconds` ago. */
+export async function hasFreshMagicLink(email: string, seconds: number): Promise<boolean> {
+  const db = getDb();
+  const since = new Date(Date.now() - seconds * 1000);
+  const rows = await db
+    .select({ id: magicLinks.id })
+    .from(magicLinks)
+    .where(
+      and(
+        eq(magicLinks.email, email),
+        isNull(magicLinks.usedAt),
+        gt(magicLinks.createdAt, since),
+        gt(magicLinks.expiresAt, new Date()),
+      ),
+    )
+    .limit(1);
+  return rows.length > 0;
+}
+
+/** Drops live and expired tokens for an address (also used on user removal). */
+export async function deleteMagicLinks(email: string) {
+  const db = getDb();
+  await db.delete(magicLinks).where(eq(magicLinks.email, email));
 }
 
 /* ---------- microdosis ---------- */

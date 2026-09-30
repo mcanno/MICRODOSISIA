@@ -8,6 +8,13 @@
       "when": 1790778485451,
       "tag": "0000_unusual_nightcrawler",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790781010622,
+      "tag": "0001_purple_red_wolf",
+      "breakpoints": true
     }
   ]
 }

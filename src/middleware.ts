@@ -2,7 +2,7 @@ import { defineMiddleware } from "astro:middleware";
 import { getSessionUser } from "@/lib/session";
 
 /** Routes reachable without a session. */
-const PUBLIC_PATHS = ["/login", "/api/auth", "/api/login"];
+const PUBLIC_PATHS = ["/login", "/api/login", "/api/magic", "/api/logout"];
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;

@@ -1,18 +1,30 @@
 ---
 import Layout from "@/components/Layout.astro";
 import { actions, isInputError } from "astro:actions";
-import { listMicrodosisForUser } from "@/lib/db/queries";
+import { listMicrodosisForUser, listUsers } from "@/lib/db/queries";
 import { NEXT_STATE, STATE_LABEL, requiresDocumentationUrl } from "@/lib/states";
 
 const items = await listMicrodosisForUser(Astro.locals.user?.id);
+const people = await listUsers();
+const me = Astro.locals.user;
 
 const result = Astro.getActionResult(actions.transitionMicrodosis);
 const domainError = result?.data && !result.data.ok ? result.data.error : null;
 const fields = result?.error && isInputError(result.error) ? result.error.fields : null;
 const urlError = fields?.documentationUrl?.[0];
+
+// Adding / removing advisors
+const createResult = Astro.getActionResult(actions.createUser);
+const removeResult = Astro.getActionResult(actions.deleteUser);
+const peopleError =
+  (createResult?.data && !createResult.data.ok ? createResult.data.error : null) ??
+  (removeResult?.data && !removeResult.data.ok ? removeResult.data.error : null);
+const createFields =
+  createResult?.error && isInputError(createResult.error) ? createResult.error.fields : null;
+const personCreated = createResult?.data?.ok === true;
 ---
 
-<Layout title="Panel de estados">
+<Layout title="Panel de gestión">
   <h1>Gestión de microdosis</h1>
   <p class="lede">
     Pasa cada microdosis de <strong>propuesta → en estudio → realizada</strong>.
@@ -76,4 +88,83 @@ const urlError = fields?.documentationUrl?.[0];
       );
     })}
   </ul>
+
+  <h2 style="margin-top:2.5rem">Personas con acceso</h2>
+  <p class="lede">
+    Solo quien aparece aquí puede entrar, y lo hace con un enlace enviado a su
+    correo <strong>@secot.org</strong> (no hay contraseñas).
+  </p>
+
+  {peopleError && <p class="notice notice-error" role="alert">{peopleError}</p>}
+  {personCreated && (
+    <p class="notice notice-ok" role="status">
+      Alta realizada. Ya puede pedir su enlace de acceso desde la pantalla de entrada.
+    </p>
+  )}
+
+  <form class="form" method="POST" action={actions.createUser}>
+    <label>
+      Correo
+      <input type="email" name="email" required placeholder="asesor@secot.org" />
+      {createFields?.email?.[0] && <span class="field-error">{createFields.email[0]}</span>}
+      <span class="hint">Solo dominio secot.org.</span>
+    </label>
+
+    <label>
+      Nombre y apellidos
+      <input type="text" name="name" required placeholder="Ana Ruiz" />
+      {createFields?.name?.[0] && <span class="field-error">{createFields.name[0]}</span>}
+    </label>
+
+    <label>
+      Rol
+      <select name="role">
+        <option value="member">Asesor</option>
+        <option value="superuser">Superusuario</option>
+      </select>
+      <span class="hint">El superusuario gestiona estados y altas/bajas.</span>
+    </label>
+
+    <button class="btn btn-primary" type="submit">Dar de alta</button>
+  </form>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Correo</th>
+        <th>Rol</th>
+        <th>Alta</th>
+        <th><span class="visually-hidden">Acciones</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      {people.map((person) => (
+        <tr>
+          <td>{person.name}</td>
+          <td>{person.email}</td>
+          <td>
+            <span class={`role role-${person.role}`}>
+              {person.role === "superuser" ? "superusuario" : "asesor"}
+            </span>
+          </td>
+          <td>{person.createdAt.toLocaleDateString("es-ES")}</td>
+          <td class="table-actions">
+            {person.id === me?.id ? (
+              <span class="meta">tú</span>
+            ) : (
+              <form
+                method="POST"
+                action={actions.deleteUser}
+                onsubmit="return confirm('¿Quitar a esta persona de la lista? Perderá sus votos.')"
+              >
+                <input type="hidden" name="id" value={person.id} />
+                <button class="btn btn-ghost btn-small" type="submit">Quitar</button>
+              </form>
+            )}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
 </Layout>

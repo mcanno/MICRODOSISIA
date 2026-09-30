@@ -40,7 +40,13 @@ export async function getSessionUser(request: Request): Promise<SessionUser | nu
     if (!token) continue;
 
     // Auth.js derives the encryption key with the cookie name as salt.
-    const payload = await decode({ token, secret, salt: name });
+    // A tampered or expired token throws; treat it as "not signed in".
+    let payload;
+    try {
+      payload = await decode({ token, secret, salt: name });
+    } catch {
+      continue;
+    }
     if (!payload?.sub) continue;
 
     return {
