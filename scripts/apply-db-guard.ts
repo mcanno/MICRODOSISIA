@@ -15,9 +15,12 @@ const sql = neon(url);
  * Second line of defence for the state machine: the database itself rejects
  * out-of-order transitions and a `realizada` row without documentation.
  * The application validates the same rules on top of this.
+ *
+ * Sent one statement at a time: the HTTP driver prepares statements and
+ * rejects a multi-statement batch.
  */
-const GUARD = `
-CREATE OR REPLACE FUNCTION enforce_microdosis_transition() RETURNS trigger AS $$
+const STATEMENTS: string[] = [
+  `CREATE OR REPLACE FUNCTION enforce_microdosis_transition() RETURNS trigger AS $$
 DECLARE
   allowed boolean;
 BEGIN
@@ -39,15 +42,16 @@ BEGIN
 
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
-
-DROP TRIGGER IF EXISTS microdosis_state_guard ON microdosis;
-CREATE TRIGGER microdosis_state_guard
+$$ LANGUAGE plpgsql;`,
+  `DROP TRIGGER IF EXISTS microdosis_state_guard ON microdosis;`,
+  `CREATE TRIGGER microdosis_state_guard
   BEFORE UPDATE OF state ON microdosis
   FOR EACH ROW
-  EXECUTE FUNCTION enforce_microdosis_transition();
-`;
+  EXECUTE FUNCTION enforce_microdosis_transition();`,
+];
 
-await sql.query(GUARD);
+for (const statement of STATEMENTS) {
+  await sql.query(statement);
+}
 console.log("Trigger de transiciones aplicado (enforce_microdosis_transition).");
 process.exit(0);

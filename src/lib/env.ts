@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 
 /**
@@ -6,18 +6,29 @@ import { resolve } from "node:path";
  *
  * Astro does *not* put `.env` values into `process.env` (they go to
  * `import.meta.env` instead), but Auth.js, Drizzle and the `tsx` scripts all
- * read `process.env`. This module loads `.env` once into `process.env` and
- * exposes one accessor. Real environment variables always win, so on a host
- * with DATABASE_URL/AUTH_SECRET configured the file is irrelevant.
+ * read `process.env`. This module loads `.env` into `process.env` and
+ * exposes one accessor.
+ *
+ * Rules:
+ * - Variables already set by the real environment always win.
+ * - An empty value (`KEY=`) counts as unset, so a later `.env` write (for
+ *   example `neon link` pulling the real DATABASE_URL) is picked up.
+ * - The file is re-read when its mtime changes, because the dev server
+ *   restarts in-process when `.env` changes.
  */
-let loaded = false;
+type Loaded = { file: string; mtimeMs: number };
+
+let loaded: Loaded | undefined;
+/** Keys this module wrote, so they can be refreshed on the next reload. */
+const injected = new Set<string>();
 
 export function loadEnv(): void {
-  if (loaded) return;
-  loaded = true;
-
   const file = resolve(process.cwd(), ".env");
   if (!existsSync(file)) return;
+
+  const mtimeMs = statSync(file).mtimeMs;
+  if (loaded?.file === file && loaded.mtimeMs === mtimeMs) return;
+  loaded = { file, mtimeMs };
 
   for (const line of readFileSync(file, "utf8").split(/\r?\n/)) {
     const trimmed = line.trim();
@@ -34,7 +45,13 @@ export function loadEnv(): void {
     ) {
       value = value.slice(1, -1);
     }
-    if (key && !(key in process.env)) process.env[key] = value;
+    if (!key || value === "") continue;
+
+    const current = process.env[key];
+    if (current === undefined || current === "" || injected.has(key)) {
+      process.env[key] = value;
+      injected.add(key);
+    }
   }
 }
 
