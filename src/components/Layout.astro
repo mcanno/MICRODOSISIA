@@ -1,0 +1,80 @@
+---
+import "@/styles/global.css";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Microaprendizajes de IA para SECOT" } = Astro.props;
+const user = Astro.locals.user;
+const path = Astro.url.pathname;
+
+const nav: { href: string; label: string }[] = [
+  { href: "/", label: "Inicio" },
+  { href: "/vote", label: "Votar temas" },
+  { href: "/microdosisia", label: "Microdosisia" },
+];
+if (user) nav.unshift({ href: "/add", label: "Añadir tema" });
+if (user?.role === "superuser") nav.push({ href: "/admin", label: "Admin" });
+
+const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title} · MICRODOSISIA</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="/">
+          <span class="brand-mark">μ</span>
+          <span class="brand-name">MICRODOSISIA</span>
+        </a>
+
+        <nav aria-label="Principal">
+          <ul>
+            {nav.map((item) => (
+              <li>
+                <a href={item.href} aria-current={isActive(item.href) ? "page" : undefined}>
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div class="account">
+          {user ? (
+            <>
+              <span class="who">
+                {user.name}
+                <span class={`role role-${user.role}`}>
+                  {user.role === "superuser" ? "superusuario" : "asesor"}
+                </span>
+              </span>
+              <a class="btn btn-ghost" href="/api/logout">Salir</a>
+            </>
+          ) : (
+            <a class="btn btn-primary" href="/login">Entrar</a>
+          )}
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>μ MICRODOSISIA · microaprendizajes de IA para <a href="https://secot.org" rel="noopener">SECOT</a></p>
+      </div>
+    </footer>
+  </body>
+</html>

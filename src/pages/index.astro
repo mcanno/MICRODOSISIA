@@ -1,0 +1,55 @@
+---
+import Layout from "@/components/Layout.astro";
+
+const user = Astro.locals.user;
+const added = Astro.url.searchParams.get("added") === "1";
+const voted = Astro.url.searchParams.get("voted") === "1";
+---
+
+<Layout title="Inicio">
+  <h1>Microaprendizajes de IA para SECOT</h1>
+  <p class="lede">
+    Propón temas, vota los que te interesan y consulta las microdosis ya preparadas
+    para acompañar a las startups que asesoras.
+  </p>
+
+  {added && <p class="notice notice-ok">Tema propuesto. Ya está en la lista abierta para votación.</p>}
+  {voted && <p class="notice notice-ok">Tu voto se ha registrado.</p>}
+
+  {user ? (
+    <p class="meta">
+      Sesión de <strong>{user.name}</strong> ({user.email}) ·{" "}
+      {user.role === "superuser" ? "superusuario" : "asesor"}
+    </p>
+  ) : (
+    <p><a class="btn btn-primary" href="/login">Identifícate para empezar</a></p>
+  )}
+
+  <div class="grid" style="margin-top:1.5rem">
+    <article class="card">
+      <h3>1 · Añadir un tema</h3>
+      <p>Propones un microaprendizaje con título y descripción: los elementos de aprendizaje que lo componen.</p>
+      <a class="btn btn-primary" href="/add">Proponer tema</a>
+    </article>
+
+    <article class="card">
+      <h3>2 · Votar un tema</h3>
+      <p>Añades tu preferencia a la lista de temas abiertos. Cada asesor cuenta una vez por tema.</p>
+      <a class="btn btn-primary" href="/vote">Ver temas abiertos</a>
+    </article>
+
+    <article class="card">
+      <h3>3 · Consultar la microdosisia</h3>
+      <p>Los elementos ya preparados, con su documentación: documentos, audios y vídeos.</p>
+      <a class="btn btn-primary" href="/microdosisia">Ir a la lista</a>
+    </article>
+
+    {user?.role === "superuser" && (
+      <article class="card">
+        <h3>Gestión · Estados</h3>
+        <p>Pasa las microdosis de propuesta a en estudio y a realizada, adjuntando su enlace de documentación.</p>
+        <a class="btn" href="/admin">Abrir panel</a>
+      </article>
+    )}
+  </div>
+</Layout>

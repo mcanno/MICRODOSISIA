@@ -1,0 +1,65 @@
+---
+import Layout from "@/components/Layout.astro";
+import { actions } from "astro:actions";
+import { listMicrodosisForUser } from "@/lib/db/queries";
+import { STATE_LABEL } from "@/lib/states";
+
+const user = Astro.locals.user;
+const items = await listMicrodosisForUser(user?.id, ["propuesta"]);
+
+const voteResult = Astro.getActionResult(actions.voteMicrodosis);
+const unvoteResult = Astro.getActionResult(actions.unvoteMicrodosis);
+
+const actionError =
+  (voteResult?.data && !voteResult.data.ok ? voteResult.data.error : null) ??
+  (unvoteResult?.data && !unvoteResult.data.ok ? unvoteResult.data.error : null) ??
+  null;
+---
+
+<Layout title="Votar temas">
+  <h1>Temas abiertos</h1>
+  <p class="lede">
+    Estos son los microaprendizajes en estado <strong>{STATE_LABEL.propuesta}</strong>.
+    Añade tu preferencia: los más votados pasarán a estudio.
+  </p>
+
+  {actionError && <p class="notice notice-error" role="alert">{actionError}</p>}
+
+  {items.length === 0 ? (
+    <div class="empty">
+      <p>No hay temas abiertos todavía. ¡Sé el primero en proponer uno!</p>
+      <p><a class="btn btn-primary" href="/add">Añadir un tema</a></p>
+    </div>
+  ) : (
+    <ul class="list">
+      {items.map((item) => (
+        <li class="item">
+          <div class="item-head">
+            <h3>{item.title}</h3>
+            <span class={`badge badge-${item.state}`}>{STATE_LABEL[item.state]}</span>
+          </div>
+          <p>{item.description}</p>
+          <div class="item-foot">
+            <span class="votes">👍 {item.voteCount} {item.voteCount === 1 ? "voto" : "votos"}</span>
+
+            {item.votedByMe ? (
+              <form method="POST" action={actions.unvoteMicrodosis}>
+                <input type="hidden" name="id" value={item.id} />
+                <button class="btn btn-small" type="submit">Quitar mi voto</button>
+              </form>
+            ) : (
+              <form method="POST" action={actions.voteMicrodosis}>
+                <input type="hidden" name="id" value={item.id} />
+                <button class="btn btn-primary btn-small" type="submit">Votar</button>
+              </form>
+            )}
+
+            <span class="meta">
+              {item.votedByMe ? "Tu voto está contabilizado" : "Todavía no has votado"}
+            </span>
+          </div>
+        </li>
+      ))}
+    </ul>
+  )}
+</Layout>

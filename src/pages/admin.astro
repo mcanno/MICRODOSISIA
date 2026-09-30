@@ -1,0 +1,79 @@
+---
+import Layout from "@/components/Layout.astro";
+import { actions, isInputError } from "astro:actions";
+import { listMicrodosisForUser } from "@/lib/db/queries";
+import { NEXT_STATE, STATE_LABEL, requiresDocumentationUrl } from "@/lib/states";
+
+const items = await listMicrodosisForUser(Astro.locals.user?.id);
+
+const result = Astro.getActionResult(actions.transitionMicrodosis);
+const domainError = result?.data && !result.data.ok ? result.data.error : null;
+const fields = result?.error && isInputError(result.error) ? result.error.fields : null;
+const urlError = fields?.documentationUrl?.[0];
+---
+
+<Layout title="Panel de estados">
+  <h1>Gestión de microdosis</h1>
+  <p class="lede">
+    Pasa cada microdosis de <strong>propuesta → en estudio → realizada</strong>.
+    Al marcarla como realizada es obligatorio adjuntar el enlace de su documentación.
+  </p>
+
+  {domainError && <p class="notice notice-error" role="alert">{domainError}</p>}
+  {urlError && <p class="notice notice-error" role="alert">{urlError}</p>}
+
+  <ul class="list">
+    {items.map((item) => {
+      const next = NEXT_STATE[item.state];
+      const needsUrl = next ? requiresDocumentationUrl(next) : false;
+
+      return (
+        <li class="item">
+          <div class="item-head">
+            <h3>{item.title}</h3>
+            <span class={`badge badge-${item.state}`}>{STATE_LABEL[item.state]}</span>
+          </div>
+          <p>{item.description}</p>
+
+          <div class="item-foot">
+            <span class="votes">👍 {item.voteCount} {item.voteCount === 1 ? "voto" : "votos"}</span>
+            <span class="meta">Propuesta por {item.createdBy ? "un asesor" : "sistema"}</span>
+          </div>
+
+          {next ? (
+            <form method="POST" action={actions.transitionMicrodosis} style="margin-top:0.9rem; display:flex; flex-direction:column; gap:0.6rem; max-width:520px">
+              <input type="hidden" name="id" value={item.id} />
+              <input type="hidden" name="to" value={next} />
+
+              {needsUrl && (
+                <label>
+                  Enlace de documentación
+                  <input
+                    type="url"
+                    name="documentationUrl"
+                    required
+                    placeholder="https://…  (documentos, audios, vídeos)"
+                    value={item.documentationUrl ?? ""}
+                  />
+                  <span class="hint">Obligatorio al marcar como realizada.</span>
+                </label>
+              )}
+
+              <button class="btn btn-primary btn-small" type="submit">
+                Pasar a «{STATE_LABEL[next]}»
+              </button>
+            </form>
+          ) : (
+            <p class="meta" style="margin-top:0.9rem">
+              {item.documentationUrl ? (
+                <>Documentación: <a href={item.documentationUrl} target="_blank" rel="noopener noreferrer">{item.documentationUrl}</a></>
+              ) : (
+                "Estado final alcanzado."
+              )}
+            </p>
+          )}
+        </li>
+      );
+    })}
+  </ul>
+</Layout>

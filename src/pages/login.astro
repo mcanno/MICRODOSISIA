@@ -1,0 +1,50 @@
+---
+import Layout from "@/components/Layout.astro";
+import { auth } from "@/lib/auth";
+
+if (Astro.locals.user) return Astro.redirect("/");
+
+// Auth.js validates the CSRF token on the POST below, so we fetch one first
+// and forward the cookies it sets to the browser.
+const csrfResponse = await auth(
+  new Request(new URL("/api/auth/csrf", Astro.url), {
+    headers: { cookie: Astro.request.headers.get("cookie") ?? "" },
+  }),
+);
+const { csrfToken } = (await csrfResponse.json()) as { csrfToken: string };
+const setCookies =
+  typeof csrfResponse.headers.getSetCookie === "function" ? csrfResponse.headers.getSetCookie() : [];
+for (const value of setCookies) Astro.response.headers.append("Set-Cookie", value);
+
+const errorCode = Astro.url.searchParams.get("error");
+const messages: Record<string, string> = {
+  CredentialsSignin: "Email o contraseña incorrectos.",
+  Configuration: "Error de configuración: falta AUTH_SECRET o DATABASE_URL.",
+  AccessDenied: "No tienes permiso para entrar.",
+};
+const error = errorCode ? (messages[errorCode] ?? `Error al iniciar sesión (${errorCode}).`) : null;
+---
+
+<Layout title="Entrar">
+  <h1>Identifícate</h1>
+  <p class="lede">Necesitas ser miembro de SECOT para proponer, votar y consultar microdosis.</p>
+
+  {error && <p class="notice notice-error" role="alert">{error}</p>}
+
+  <form class="form" method="post" action="/api/auth/callback/credentials">
+    <input type="hidden" name="csrfToken" value={csrfToken} />
+    <input type="hidden" name="callbackUrl" value="/" />
+
+    <label>
+      Email
+      <input type="email" name="email" autocomplete="email" required />
+    </label>
+
+    <label>
+      Contraseña
+      <input type="password" name="password" autocomplete="current-password" required />
+    </label>
+
+    <button class="btn btn-primary" type="submit">Entrar</button>
+  </form>
+</Layout>

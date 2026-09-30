@@ -1,0 +1,46 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  // Project instructions live in AGENTS.md — OpenCode loads it automatically.
+  // Do NOT use the "instructions" array: V2 accepts the field but does not
+  // resolve its files, globs, or URLs yet.
+  // See https://opencode.ai/v2/docs/instructions
+
+  // Default model in `provider/model` format (root default drops any `#variant`).
+  // "model": "opencode/longcat-2.5-preview-free",
+
+  // Primary agent used when a session does not pick one explicitly.
+  // "default_agent": "build",
+
+  // Format files after write/edit/patch. Built-ins run only when their
+  // executable and project requirements are available (prettier, biome,
+  // rustfmt, ruff, gofmt, ...). Set to false to disable.
+  // See https://opencode.ai/v2/docs/formatters
+  "formatter": true
+
+  // Ordered rules; the last matching rule wins, so put broad rules first.
+  // If nothing matches, OpenCode asks.
+  // See https://opencode.ai/v2/docs/permissions
+  // "permissions": [
+  //   { "action": "shell", "resource": "*", "effect": "ask" },
+  //   { "action": "shell", "resource": "git status *", "effect": "allow" },
+  //   { "action": "shell", "resource": "git diff *", "effect": "allow" },
+  //   { "action": "shell", "resource": "git push *", "effect": "deny" },
+  //   { "action": "edit", "resource": "dist/**", "effect": "deny" },
+  // ],
+
+  // Skip files that should not trigger filesystem updates.
+  // "watcher": { "ignore": ["dist/**", "coverage/**", "node_modules/**"] },
+
+  // Override or add agents, commands, MCP servers, plugins, skills, providers.
+  // "agents": {},
+  // "commands": {},
+  // "mcp": { "servers": {} },
+  // "plugins": [],
+  // "skills": ["./team-skills"],
+
+  // NOTE: themes and keybinds are NOT project settings. They live in the
+  // global terminal config `~/.config/opencode/cli.json` (schema
+  // https://opencode.ai/v2/cli.json), e.g. { "theme": { "name": "tokyonight",
+  // "mode": "system" } }. Most can also be changed from the TUI with Ctrl+P.
+}

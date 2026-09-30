@@ -1,0 +1,64 @@
+---
+import Layout from "@/components/Layout.astro";
+import { listMicrodosisForUser } from "@/lib/db/queries";
+import { STATE_LABEL, type MicrodosisState } from "@/lib/states";
+
+const user = Astro.locals.user;
+const items = await listMicrodosisForUser(user?.id);
+
+const sections: { state: MicrodosisState; intro: string }[] = [
+  {
+    state: "realizada",
+    intro: "Microdosis ya preparadas, con su enlace de documentación (documentos, audios, vídeos).",
+  },
+  { state: "en_estudio", intro: "En preparación: el equipo ya está trabajando en ellas." },
+  { state: "propuesta", intro: "Propuestas abiertas. Puedes votarlas para que avancen." },
+];
+
+const byState = (state: MicrodosisState) => items.filter((item) => item.state === state);
+---
+
+<Layout title="Microdosisia">
+  <h1>La microdosisia</h1>
+  <p class="lede">Todos los microaprendizajes, organizados por su estado actual.</p>
+
+  {sections.map(({ state, intro }) => {
+    const list = byState(state);
+    return (
+      <section>
+        <h2>
+          {STATE_LABEL[state]}{" "}
+          <span class={`badge badge-${state}`}>{list.length}</span>
+        </h2>
+        <p class="meta">{intro}</p>
+
+        {list.length === 0 ? (
+          <div class="empty">
+            <p>No hay microdosis en «{STATE_LABEL[state]}».</p>
+            {state === "propuesta" && <p><a class="btn btn-primary" href="/add">Proponer un tema</a></p>}
+          </div>
+        ) : (
+          <ul class="list">
+            {list.map((item) => (
+              <li class="item">
+                <div class="item-head">
+                  <h3>{item.title}</h3>
+                  <span class={`badge badge-${item.state}`}>{STATE_LABEL[item.state]}</span>
+                </div>
+                <p>{item.description}</p>
+                <div class="item-foot">
+                  <span class="votes">👍 {item.voteCount} {item.voteCount === 1 ? "voto" : "votos"}</span>
+                  {item.state === "realizada" && item.documentationUrl && (
+                    <a class="btn btn-small" href={item.documentationUrl} target="_blank" rel="noopener noreferrer">
+                      Ver documentación ↗
+                    </a>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    );
+  })}
+</Layout>

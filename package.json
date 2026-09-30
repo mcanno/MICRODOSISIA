@@ -1,0 +1,33 @@
+{
+  "name": "microdosisia",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "typecheck": "astro check",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "db:guard": "tsx scripts/apply-db-guard.ts",
+    "user:create": "tsx scripts/create-user.ts"
+  },
+  "dependencies": {
+    "@astrojs/node": "^9.5.5",
+    "@auth/core": "^0.41.3",
+    "@neondatabase/serverless": "^1.1.0",
+    "astro": "^5.18.2",
+    "drizzle-orm": "^0.45.3",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@types/node": "^22.10.0",
+    "drizzle-kit": "^0.31.11",
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.3"
+  }
+}

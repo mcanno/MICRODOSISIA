@@ -1,0 +1,53 @@
+---
+import Layout from "@/components/Layout.astro";
+import { actions, isInputError } from "astro:actions";
+
+const result = Astro.getActionResult(actions.addMicrodosis);
+
+if (result?.data?.ok) return Astro.redirect("/?added=1");
+
+const domainError = result?.data && !result.data.ok ? result.data.error : null;
+const fields = result?.error && isInputError(result.error) ? result.error.fields : null;
+
+const firstError = (name: string) => fields?.[name]?.[0];
+---
+
+<Layout title="Añadir un tema">
+  <h1>Añadir un tema</h1>
+  <p class="lede">
+    Rellena el título y la descripción con los elementos de aprendizaje del microaprendizaje.
+    El tema entra como <strong>propuesta</strong> y la comunidad decidirá con sus votos.
+  </p>
+
+  {domainError && <p class="notice notice-error" role="alert">{domainError}</p>}
+
+  <form class="form" method="POST" action={actions.addMicrodosis}>
+    <label>
+      Título
+      <input
+        type="text"
+        name="title"
+        required
+        minlength="8"
+        maxlength="120"
+        placeholder="p. ej. Cómo validar una idea con 10 entrevistas"
+      />
+      {firstError("title") && <span class="field-error">{firstError("title")}</span>}
+      <span class="hint">Entre 8 y 120 caracteres.</span>
+    </label>
+
+    <label>
+      Descripción · elementos de aprendizaje
+      <textarea
+        name="description"
+        required
+        minlength="20"
+        maxlength="4000"
+        placeholder="Qué aprenderá el asesor, en qué consiste, qué podrá aplicar al terminar…"></textarea>
+      {firstError("description") && <span class="field-error">{firstError("description")}</span>}
+      <span class="hint">Entre 20 y 4000 caracteres.</span>
+    </label>
+
+    <button class="btn btn-primary" type="submit">Proponer tema</button>
+  </form>
+</Layout>
