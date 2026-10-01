@@ -24,3 +24,6 @@ Thumbs.db
 
 # drizzle (keep drizzle/meta: the migration journal is required by db:migrate)
 .neon
+
+# local CA bundles (antivirus SMTP interception), never committed
+.certs/

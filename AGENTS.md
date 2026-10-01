@@ -88,7 +88,8 @@ Astro 7 with `output: "server"` and the Node adapter — every page is SSR.
 - `src/lib/auth.ts` — builds that cookie (Auth.js JWT, salt = cookie name);
   `src/lib/session.ts` reads it back without an extra request.
 - `src/lib/mailer.ts` — how the link is delivered (`EMAIL_TRANSPORT`:
-  `log` locally, `resend` in production).
+  `log` locally, `smtp` in production — Microsoft 365 on
+  `smtp.office365.com:587` — or `resend`).
 - `src/lib/states.ts` — the state machine (`propuesta → en estudio →
   realizada`). Routes, actions and UI must use its helpers; the same rules
   are enforced a second time by a Postgres trigger installed with
@@ -169,11 +170,22 @@ errors, and anonymous requests to `/vote` redirect to `/login`. Run it against
   Unsupported Media Type**. Adding a new action? Copy the option.
 - **No `.env` → login fails** with `error=config`: `AUTH_SECRET` (signs the
   session cookie) and `DATABASE_URL` (looks the address up) are required.
-- **No mail provider configured**: with `EMAIL_TRANSPORT=log` (the default)
-  nothing is emailed — on localhost the link is shown on the page after
-  submitting the form, and outside localhost the login refuses instead of
-  silently losing links. Production needs `EMAIL_TRANSPORT=resend` plus
-  `RESEND_API_KEY` and `EMAIL_FROM`.
+- **Mail**: `EMAIL_TRANSPORT=log` (the default) emails nothing — on localhost
+  the link is shown on the page after submitting the form, and outside
+  localhost the login refuses instead of silently losing links. Production is
+  configured as **`EMAIL_TRANSPORT=smtp`** against Microsoft 365
+  (`smtp.office365.com:587`, `SMTP_USER`/`SMTP_PASS` = the mailbox, an app
+  password when MFA is on, `EMAIL_FROM` = that mailbox); `resend` is still
+  supported as an alternative branch.
+- **Antivirus intercepts SMTP STARTTLS on this machine**: Avast Mail Shield
+  answers with a certificate issued by its own root (`Avast Web/Mail Shield
+  Root`), which Node rejects with `self-signed certificate in certificate
+  chain` because Node never reads the Windows cert store. Fix already in
+  place: the root is exported to `.certs/avast-mail-shield-root.pem` (gitignored)
+  and `SMTP_CA_FILE` points at it so `mailer.ts` trusts it *in addition to*
+  Node's roots. Empty in production, where the real chain is used. Re-export
+  it if Avast rotates the certificate, or if sending suddenly fails locally
+  with that message.
 - The database client is created lazily, so importing modules without a
   database configured does not break `npm run build`.
 - The Postgres trigger from `npm run db:guard` raises an exception on an

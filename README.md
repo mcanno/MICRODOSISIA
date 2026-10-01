@@ -49,6 +49,7 @@ consola.
 | Valor | Comportamiento |
 | --- | --- |
 | `log` (por defecto) | No envía nada. **En localhost el enlace se muestra en la propia página**; fuera de localhost se rechaza para no perder enlaces. |
+| `smtp` | Envío real por SMTP (nodemailer). secot.org usa Microsoft 365: `SMTP_HOST=smtp.office365.com`, `SMTP_PORT=587`, `SMTP_USER` y `SMTP_PASS` = el buzón (contraseña de aplicación si hay MFA), `EMAIL_FROM` = ese mismo buzón. `SMTP_CA_FILE` (opcional) añade una raíz de confianza extra, para máquinas cuyo antivirus intercepte el SMTP. |
 | `resend` | Envío real vía [Resend](https://resend.com): requiere `RESEND_API_KEY` y `EMAIL_FROM`. |
 
 ## Comandos
@@ -75,7 +76,7 @@ src/
 ├── components/Layout.astro
 ├── lib/
 │   ├── magic.ts           enlace de acceso: emisión, consumo, dominio SECOT
-│   ├── mailer.ts          envío del correo (log local / resend)
+│   ├── mailer.ts          envío del correo (log local / smtp M365 / resend)
 │   ├── auth.ts            emisión de la cookie de sesión (JWT)
 │   ├── session.ts         lectura de la cookie de sesión
 │   ├── http.ts            origen/protocolo de la petición (proxy)

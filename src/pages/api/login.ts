@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 import { isLocalRequest, requestOrigin } from "@/lib/http";
 import { isSecotEmail, issueMagicLink } from "@/lib/magic";
-import { sendMagicLinkEmail } from "@/lib/mailer";
+import { isLogTransport, sendMagicLinkEmail } from "@/lib/mailer";
 
 const emailSchema = z
   .string()
@@ -52,7 +52,7 @@ export const POST: APIRoute = async ({ request, url, redirect }) => {
 
     // Without a mail provider the link is shown on the next page instead of
     // being emailed — only ever possible from this machine.
-    if (local) params.set("link", link);
+    if (local && isLogTransport()) params.set("link", link);
   }
 
   return back(Object.fromEntries(params));
