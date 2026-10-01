@@ -19,7 +19,8 @@ voten y consulten microaprendizajes de IA («microdosis»).
 
 ## Stack
 
-- **Astro 7** (SSR, adaptador Node) + TypeScript + CSS propio
+- **Astro 7** (SSR, adaptador Node en local y `@astrojs/vercel` en producción)
+  + TypeScript + CSS propio
 - Acceso por **enlace mágico** (`src/lib/magic.ts` + `src/lib/mailer.ts`) y
   sesión JWT en cookie firmada con `@auth/core`
 - **Neon (Postgres)** con **Drizzle ORM**
@@ -96,7 +97,35 @@ scripts/                  creación de usuarios y guard de base de datos
 
 ## Despliegue
 
-El build es SSR (`@astrojs/node`, modo `standalone`): necesita un host con
-Node. GitHub Pages **no** sirve SSR — publica el código en GitHub y despliega
-en Vercel, Netlify, Railway o similar (cambiando solo el adaptador de Astro si
-hace falta).
+El build es SSR, así que necesita un host con Node. **Vercel** ya está
+preparado en el repo:
+
+1. **Importa el repositorio** en Vercel (`vercel.com/new` →
+   `github.com/mcanno/MICRODOSISIA`). Vercel define `VERCEL=1` al compilar y
+   `astro.config.mjs` elige entonces `@astrojs/vercel` (runtime `nodejs22.x`,
+   `maxDuration: 30`); en local sigues con `@astrojs/node` para `dev` y
+   `preview`.
+2. **Variables de entorno** del proyecto (mismos nombres que `.env`):
+
+   | Variable | Valor |
+   | --- | --- |
+   | `DATABASE_URL` | cadena de conexión de Neon (producción) |
+   | `AUTH_SECRET` | secreto **nuevo**: `openssl rand -base64 32` |
+   | `PUBLIC_SITE_URL` | `https://<proyecto>.vercel.app` |
+   | `EMAIL_TRANSPORT` | `smtp` |
+   | `SMTP_HOST` / `SMTP_PORT` | `smtp.office365.com` / `587` |
+   | `SMTP_USER` / `SMTP_PASS` | el buzón y su contraseña (de aplicación si hay MFA) |
+   | `EMAIL_FROM` | `MICRODOSISIA <buzón>` |
+   | `SMTP_CA_FILE` | **no se define** — el de Avast solo existe en tu máquina |
+
+3. **Base de datos de producción**: `npm run db:migrate` y `npm run db:guard`
+   con el `DATABASE_URL` de producción, y alta del primer superusuario con
+   `npm run user:create`.
+4. **Hostname permitido**: `astro.config.mjs` acepta `localhost`,
+   `microdosisia.vercel.app` y el de `PUBLIC_SITE_URL`. Si el proyecto se llama
+   distinto o añadís un dominio propio, hay que meterlo en `hosts` **antes** de
+   desplegar: sin esa entrada **todos los formularios responden 403**.
+
+Vercel solo bloquea el puerto 25 de salida, así que el SMTP por el 587 funciona
+desde sus funciones. GitHub Pages **no** sirve SSR; Netlify, Railway o un VPS
+también valen cambiando el adaptador.

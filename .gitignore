@@ -11,10 +11,13 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# environment — never commit real credentials
+# environment - never commit real credentials
 .env
 .env.*
 !.env.example
+
+# Vercel build output (written by the CI build, not needed locally)
+.vercel/
 
 # editor / OS
 .vscode/*

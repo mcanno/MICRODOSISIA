@@ -76,9 +76,41 @@ Setup order: `npm install` → `cp .env.example .env` (fill `DATABASE_URL` and
 `AUTH_SECRET`) → `db:generate` → `db:migrate` → `db:guard` → `user:create` →
 `dev`.
 
+## Deployment (Vercel)
+
+The repo deploys from GitHub: import it in Vercel and it builds itself
+(`VERCEL=1` selects `@astrojs/vercel`, `maxDuration: 30`, runtime `nodejs22.x`).
+Both build paths are verifiable locally:
+
+```bash
+npm run build                                   # Node adapter (what preview uses)
+VERCEL=1 PUBLIC_SITE_URL=https://microdosisia.vercel.app npm run build   # writes .vercel/output
+```
+
+Environment variables for the Vercel project (same names as `.env`):
+
+| Var | Value |
+| --- | --- |
+| `DATABASE_URL` | production Neon connection string |
+| `AUTH_SECRET` | a **new** secret (`openssl rand -base64 32`), not the local one |
+| `PUBLIC_SITE_URL` | `https://<project>.vercel.app` — also read by `astro.config.mjs` to fill `allowedDomains` |
+| `EMAIL_TRANSPORT` | `smtp` |
+| `SMTP_HOST` / `SMTP_PORT` | `smtp.office365.com` / `587` |
+| `SMTP_USER` / `SMTP_PASS` | the mailbox and its password (app password with MFA) |
+| `EMAIL_FROM` | `MICRODOSISIA <that-mailbox>` |
+| `SMTP_CA_FILE` | **leave unset** — the Avast root only exists on the local machine |
+
+After changing the deployed hostname, add it to `allowedDomains`
+(`astro.config.mjs`) and redeploy, run `npm run db:migrate` + `npm run db:guard`
+against the production database, and add the first superuser with
+`npm run user:create`. Vercel blocks outbound port 25 only, so SMTP 587 works
+from its functions as long as the send is awaited (it is).
+
 ## Architecture
 
-Astro 7 with `output: "server"` and the Node adapter — every page is SSR.
+Astro 7 with `output: "server"` — every page is SSR. The adapter depends on
+where it runs: `@astrojs/node` locally (so `dev` and `preview` keep working
+exactly as before) and `@astrojs/vercel` when `VERCEL=1` (see Deployment).
 
 - `src/middleware.ts` — runs first: decodes the session into
   `Astro.locals.user`, redirects anonymous users to `/login`, and keeps
@@ -163,8 +195,11 @@ errors, and anonymous requests to `/vote` redirect to `/login`. Run it against
   `http://localhost`, so `checkOrigin` compares against the wrong origin and
   answers **403 Cross-site POST form submissions are forbidden** to every form
   in `preview`/production (Vite's `dev` server is unaffected, which is why it
-  only shows up when testing the real build). **Add the deployed hostname
-  before going live**, or login breaks in production.
+  only shows up when testing the real build). The list is built at config
+  time from `localhost`, `microdosisia.vercel.app` and the hostname of
+  `PUBLIC_SITE_URL` — **if the project is renamed or a custom domain is
+  added, put the new hostname in `hosts`** (`astro.config.mjs`) and redeploy,
+  or every form answers 403 in production.
 - **Zod must stay on v4** (`^4.x`): Astro 6+ bundles Zod 4 in its action
   types, so Zod 3 breaks `astro check`. Note the deprecated string formats:
   use `z.uuid()` / `z.url()`, and for *trim first, validate second* write
