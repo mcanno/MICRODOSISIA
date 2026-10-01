@@ -8,7 +8,7 @@ const emailSchema = z
   .string()
   .trim()
   .min(1, "Indica tu correo.")
-  .email("Ese correo no tiene un formato válido.");
+  .pipe(z.email("Ese correo no tiene un formato válido."));
 
 /**
  * Step 1 of the login: the form posts the address here. If it is a SECOT

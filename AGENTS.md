@@ -75,7 +75,7 @@ Setup order: `npm install` → `cp .env.example .env` (fill `DATABASE_URL` and
 
 ## Architecture
 
-Astro 5 with `output: "server"` and the Node adapter — every page is SSR.
+Astro 7 with `output: "server"` and the Node adapter — every page is SSR.
 
 - `src/middleware.ts` — runs first: decodes the session into
   `Astro.locals.user`, redirects anonymous users to `/login`, and keeps
@@ -144,10 +144,13 @@ errors, and anonymous requests to `/vote` redirect to `/login`. Run it against
 - **Node version**: this machine now runs **Node 22.23.2** (LTS). Anything
   ≥ 22.20 is required — Astro 7 needs ≥ 22.12 and the Neon CLI ≥ 22.20.
   Older Node fails `astro check` with `ERR_REQUIRE_ESM`.
-- **Astro is still pinned to 5.x**, and that is now the only thing left:
-  `npm audit` reports a **critical** advisory plus several high ones in Astro
-  5.18 whose fix is `astro@7.3.5` (breaking). Node is no longer the blocker,
-  so upgrading to Astro 7 is the pending security work.
+- **Astro 7 is the current stack** (7.3.5, upgraded from 5.18.2): Vite 8, the
+  Rust compiler (which **errors on unclosed tags** instead of fixing them) and
+  `compressHTML: "jsx"` (whitespace between inline elements is dropped — keep
+  spacing in CSS, e.g. flex `gap`, or write `{" "}`). `npm audit` is clean for
+  shipped code; the only remaining advisories are **4 moderate, dev-only** in
+  `drizzle-kit`'s pinned `esbuild`, whose "fix" downgrades `drizzle-kit` to
+  0.18.1 — not worth it.
 - **Every served hostname must be in `security.allowedDomains`**
   (`astro.config.mjs`). Astro rebuilds the request URL only from hosts listed
   there; with an empty list it ignores the `Host` header and falls back to
@@ -156,8 +159,11 @@ errors, and anonymous requests to `/vote` redirect to `/login`. Run it against
   in `preview`/production (Vite's `dev` server is unaffected, which is why it
   only shows up when testing the real build). **Add the deployed hostname
   before going live**, or login breaks in production.
-- **Zod must stay on v3** (`^3.25.x`): Astro's action types bundle Zod v3, so
-  Zod 4 breaks `astro check`.
+- **Zod must stay on v4** (`^4.x`): Astro 6+ bundles Zod 4 in its action
+  types, so Zod 3 breaks `astro check`. Note the deprecated string formats:
+  use `z.uuid()` / `z.url()`, and for *trim first, validate second* write
+  `z.string().trim().min(1, …).pipe(z.email(…))` — `z.email().trim()` validates
+  **before** trimming and rejects padded input.
 - **Astro actions are JSON-only by default**: any action called from an HTML
   form must declare `accept: "form"`, or every submit answers **415
   Unsupported Media Type**. Adding a new action? Copy the option.

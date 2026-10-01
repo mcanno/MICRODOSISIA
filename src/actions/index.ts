@@ -55,7 +55,7 @@ export const server = {
   /** Step 4: record a preference on an open topic (`propuesta`). */
   voteMicrodosis: defineAction({
     accept: "form",
-    input: z.object({ id: z.string().uuid() }),
+    input: z.object({ id: z.uuid() }),
     handler: async (input, context): Promise<ActionResult> => {
       const user = context.locals.user;
       if (!user) return { ok: false, error: "Debes iniciar sesión." };
@@ -74,7 +74,7 @@ export const server = {
   /** Allows retracting a vote while the topic is still open. */
   unvoteMicrodosis: defineAction({
     accept: "form",
-    input: z.object({ id: z.string().uuid() }),
+    input: z.object({ id: z.uuid() }),
     handler: async (input, context): Promise<ActionResult> => {
       const user = context.locals.user;
       if (!user) return { ok: false, error: "Debes iniciar sesión." };
@@ -94,9 +94,9 @@ export const server = {
   transitionMicrodosis: defineAction({
     accept: "form",
     input: z.object({
-      id: z.string().uuid(),
+      id: z.uuid(),
       to: z.string(),
-      documentationUrl: z.string().url().optional(),
+      documentationUrl: z.url().optional(),
     }),
     handler: async (input, context): Promise<ActionResult> => {
       const user = context.locals.user;
@@ -138,7 +138,7 @@ export const server = {
         .string()
         .trim()
         .min(1, "Indica el correo.")
-        .email("Ese correo no tiene un formato válido.")
+        .pipe(z.email("Ese correo no tiene un formato válido."))
         .refine((value) => isSecotEmail(value), "Solo se permite el dominio secot.org."),
       name: z
         .string()
@@ -172,7 +172,7 @@ export const server = {
   /** Superuser-only: removes an address (their votes disappear with it). */
   deleteUser: defineAction({
     accept: "form",
-    input: z.object({ id: z.string().uuid() }),
+    input: z.object({ id: z.uuid() }),
     handler: async (input, context): Promise<ActionResult> => {
       const user = context.locals.user;
       if (!user) return { ok: false, error: "Debes iniciar sesión." };

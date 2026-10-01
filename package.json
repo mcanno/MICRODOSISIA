@@ -16,14 +16,14 @@
     "user:create": "tsx scripts/create-user.ts"
   },
   "dependencies": {
-    "@astrojs/node": "^9.5.5",
+    "@astrojs/node": "^11.1.6",
     "@auth/core": "^0.41.3",
     "@neon/config": "^1.8.3",
     "@neon/env": "^1.4.8",
     "@neondatabase/serverless": "^1.1.0",
-    "astro": "^5.18.2",
+    "astro": "^7.3.5",
     "drizzle-orm": "^0.45.3",
-    "zod": "^3.25.76"
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",

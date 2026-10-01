@@ -17,7 +17,7 @@ voten y consulten microaprendizajes de IA («microdosis»).
 
 ## Stack
 
-- **Astro 5** (SSR, adaptador Node) + TypeScript + CSS propio
+- **Astro 7** (SSR, adaptador Node) + TypeScript + CSS propio
 - Acceso por **enlace mágico** (`src/lib/magic.ts` + `src/lib/mailer.ts`) y
   sesión JWT en cookie firmada con `@auth/core`
 - **Neon (Postgres)** con **Drizzle ORM**
