@@ -4,6 +4,8 @@ Sitio web para que los asesores de **SECOT** ([secot.org](https://secot.org)) pr
 voten y consulten microaprendizajes de IA («microdosis»).
 
 📖 **Manual de usuario para los asesores:** [`docs/manual-usuario.md`](docs/manual-usuario.md)
+ (y la [lista de verificación](docs/verificacion-manual.md) para comprobarlo,
+  y los [pendientes](docs/pendientes.md))
 
 ## Flujo
 
