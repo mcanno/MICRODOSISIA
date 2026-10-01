@@ -59,6 +59,17 @@ export async function deleteUser(id: string) {
   return deleted ?? null;
 }
 
+/** The only way to change a role: the CLI script (`npm run user:role`). */
+export async function setRole(email: string, role: "member" | "superuser") {
+  const db = getDb();
+  const rows = await db
+    .update(users)
+    .set({ role })
+    .where(eq(users.email, email.trim().toLowerCase()))
+    .returning();
+  return rows[0] ?? null;
+}
+
 /* ---------- magic links ---------- */
 
 /** Replaces any outstanding link: at most one live token per address. */

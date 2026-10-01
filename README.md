@@ -40,7 +40,8 @@ npm run dev               # http://localhost:4321
 `user:create` no pide contraseña: esa persona entra con el enlace que se le
 envía a su correo. Acepta el rol opcional `member` (por defecto) o `superuser`;
 desde `/admin` un superusuario puede dar de alta y dar de baja sin usar la
-consola.
+consola. Para cambiar el rol de una cuenta ya existente (la UI no lo permite):
+`npm run user:role -- correo@secot.org superuser`.
 
 ### Correo del enlace de acceso
 
@@ -61,6 +62,8 @@ consola.
 | `npm run preview` | Sirve el build |
 | `npx tsc --noEmit` | Comprueba los archivos `.ts` |
 | `npm run typecheck` | `astro check` (también `.astro`) |
+| `npm run user:create -- <correo> <nombre> [rol]` | Da de alta una cuenta (sin contraseña) |
+| `npm run user:role -- <correo> <rol>` | Cambia el rol de una cuenta existente |
 | `npm run db:generate` | Genera migración a partir del esquema |
 | `npm run db:migrate` | Aplica migraciones pendientes |
 | `npm run db:studio` | Consola Drizzle para inspeccionar datos |

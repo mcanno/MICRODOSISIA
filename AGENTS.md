@@ -68,6 +68,9 @@ link). Transitions are one-way and only valid from the previous state.
   state transitions; run once per database, after `db:migrate`
 - `npm run user:create -- <email> <name> [member|superuser]` — no password:
   the person signs in with the link emailed to that address
+- `npm run user:role -- <email> <member|superuser>` — promote or demote an
+  existing account (the UI has no such control; refuses to remove the last
+  superuser)
 
 Setup order: `npm install` → `cp .env.example .env` (fill `DATABASE_URL` and
 `AUTH_SECRET`) → `db:generate` → `db:migrate` → `db:guard` → `user:create` →

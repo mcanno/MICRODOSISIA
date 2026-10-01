@@ -13,7 +13,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:guard": "tsx scripts/apply-db-guard.ts",
-    "user:create": "tsx scripts/create-user.ts"
+    "user:create": "tsx scripts/create-user.ts",
+    "user:role": "tsx scripts/set-role.ts"
   },
   "dependencies": {
     "@astrojs/node": "^11.1.6",
