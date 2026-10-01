@@ -9,7 +9,7 @@ if (result?.data?.ok) return Astro.redirect("/?added=1");
 const domainError = result?.data && !result.data.ok ? result.data.error : null;
 const fields = result?.error && isInputError(result.error) ? result.error.fields : null;
 
-const firstError = (name: string) => fields?.[name]?.[0];
+const firstError = (name: "title" | "description") => fields?.[name]?.[0];
 ---
 
 <Layout title="Añadir un tema">

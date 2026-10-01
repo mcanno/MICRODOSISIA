@@ -61,9 +61,8 @@ link). Transitions are one-way and only valid from the previous state.
 - `npm install` — dependencies
 - `npm run dev` — dev server on http://localhost:4321
 - `npm run build` / `npm run preview` — production build and local preview
-- `npx tsc --noEmit` — type-check the `.ts` sources (works on Node 20)
+- `npx tsc --noEmit` — type-check the `.ts` sources
 - `npm run typecheck` — `astro check`, also checks `.astro` files
-  (needs Node ≥ 22.12, see Gotchas)
 - `npm run db:generate` / `db:migrate` / `db:studio` — Drizzle migrations
 - `npm run db:guard` — installs the Postgres trigger that rejects invalid
   state transitions; run once per database, after `db:migrate`
@@ -130,23 +129,33 @@ Before considering a change done:
 
 1. `npx tsc --noEmit` — clean, no type errors.
 2. `npm run build` — must succeed.
-3. With Node ≥ 22.12: `npm run typecheck` (`astro check`) as well.
+3. `npm run typecheck` (`astro check`) as well.
 
 Manual smoke test for UI or flow changes: `/` renders, `/login` shows the
 email-only form, requesting a link with a non-`secot.org` address or an
 address that is not on the list shows the Spanish error, a valid link signs
 you in (and cannot be replayed), submitting an invalid form shows field
-errors, and anonymous requests to `/vote` redirect to `/login`.
+errors, and anonymous requests to `/vote` redirect to `/login`. Run it against
+`npm run preview`, not just `dev`: a form POST there must answer **302**, never
+**403** (see the `allowedDomains` gotcha).
 
 ## Gotchas
 
-- **Node version**: the machine running this repo has Node 20.11.
-  `npm run typecheck` (`astro check`) fails there with `ERR_REQUIRE_ESM`
-  because the Astro language server needs Node ≥ 22.12. Use
-  `npx tsc --noEmit` instead, or upgrade Node.
-- **Astro is pinned to 5.x** because Astro 7 requires Node ≥ 22.12. Note that
-  `npm audit` reports advisories in Astro 5.18 that are fixed only in 7.x —
-  upgrading Node and then Astro is the pending security work.
+- **Node version**: this machine now runs **Node 22.23.2** (LTS). Anything
+  ≥ 22.20 is required — Astro 7 needs ≥ 22.12 and the Neon CLI ≥ 22.20.
+  Older Node fails `astro check` with `ERR_REQUIRE_ESM`.
+- **Astro is still pinned to 5.x**, and that is now the only thing left:
+  `npm audit` reports a **critical** advisory plus several high ones in Astro
+  5.18 whose fix is `astro@7.3.5` (breaking). Node is no longer the blocker,
+  so upgrading to Astro 7 is the pending security work.
+- **Every served hostname must be in `security.allowedDomains`**
+  (`astro.config.mjs`). Astro rebuilds the request URL only from hosts listed
+  there; with an empty list it ignores the `Host` header and falls back to
+  `http://localhost`, so `checkOrigin` compares against the wrong origin and
+  answers **403 Cross-site POST form submissions are forbidden** to every form
+  in `preview`/production (Vite's `dev` server is unaffected, which is why it
+  only shows up when testing the real build). **Add the deployed hostname
+  before going live**, or login breaks in production.
 - **Zod must stay on v3** (`^3.25.x`): Astro's action types bundle Zod v3, so
   Zod 4 breaks `astro check`.
 - **Astro actions are JSON-only by default**: any action called from an HTML

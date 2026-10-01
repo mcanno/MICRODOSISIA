@@ -25,7 +25,7 @@ voten y consulten microaprendizajes de IA («microdosis»).
 
 ## Puesta en marcha
 
-Requisitos: Node 20.3+ (ver `AGENTS.md` sobre Node 22) y una base de datos Neon.
+Requisitos: Node ≥ 22.20 y una base de datos Neon.
 
 ```bash
 npm install
@@ -59,7 +59,7 @@ consola.
 | `npm run build` | Compila a `dist/` |
 | `npm run preview` | Sirve el build |
 | `npx tsc --noEmit` | Comprueba los archivos `.ts` |
-| `npm run typecheck` | `astro check` (también `.astro`; requiere Node ≥ 22.12) |
+| `npm run typecheck` | `astro check` (también `.astro`) |
 | `npm run db:generate` | Genera migración a partir del esquema |
 | `npm run db:migrate` | Aplica migraciones pendientes |
 | `npm run db:studio` | Consola Drizzle para inspeccionar datos |
