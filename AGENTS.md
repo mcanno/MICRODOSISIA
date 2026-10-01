@@ -89,7 +89,9 @@ Astro 7 with `output: "server"` and the Node adapter — every page is SSR.
   `src/lib/mailer.ts`; `GET /api/magic?token=…` consumes it atomically and
   issues the session cookie.
 - `src/lib/auth.ts` — builds that cookie (Auth.js JWT, salt = cookie name);
-  `src/lib/session.ts` reads it back without an extra request.
+  `src/lib/session.ts` proves the identity from it and reads role, name and
+  existence from the database on **every request**, so promotions, demotions
+  and removals apply immediately instead of lasting the 30 days of the token.
 - `src/lib/mailer.ts` — how the link is delivered (`EMAIL_TRANSPORT`:
   `log` locally, `smtp` in production — Microsoft 365 on
   `smtp.office365.com:587` — or `resend`).

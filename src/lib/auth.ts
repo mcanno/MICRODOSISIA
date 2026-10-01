@@ -30,7 +30,10 @@ export async function createSessionCookie(
     secret,
     salt: name,
     maxAge: SESSION_MAX_AGE,
-    token: { sub: user.id, email: user.email, name: user.name, role: user.role },
+    // The role is deliberately absent: `session.ts` reads it from the
+    // database on every request, so promotions, demotions and removals
+    // apply immediately instead of lasting the whole token lifetime.
+    token: { sub: user.id, email: user.email, name: user.name },
   });
 
   const flags = ["Path=/", "HttpOnly", "SameSite=Lax", `Max-Age=${SESSION_MAX_AGE}`];
