@@ -12,11 +12,11 @@ const onVercel = process.env.VERCEL === "1";
  * ignores the `Host` header and falls back to `http://localhost`, which makes
  * `checkOrigin` reject every form POST (403) in production.
  *
- * `microdosisia.vercel.app` is the deployed hostname — if the Vercel project
+ * `microdosis-ia.vercel.app` is the deployed hostname — if the Vercel project
  * is renamed or a custom domain is added, add it here (PUBLIC_SITE_URL is
  * picked up automatically as well).
  */
-const hosts = new Set(["localhost", "microdosisia.vercel.app"]);
+const hosts = new Set(["localhost", "microdosis-ia.vercel.app"]);
 if (process.env.PUBLIC_SITE_URL) {
   try {
     hosts.add(new URL(process.env.PUBLIC_SITE_URL).hostname);

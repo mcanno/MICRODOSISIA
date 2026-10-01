@@ -111,7 +111,7 @@ preparado en el repo:
    | --- | --- |
    | `DATABASE_URL` | cadena de conexión de Neon (producción) |
    | `AUTH_SECRET` | secreto **nuevo**: `openssl rand -base64 32` |
-   | `PUBLIC_SITE_URL` | `https://<proyecto>.vercel.app` |
+   | `PUBLIC_SITE_URL` | `https://microdosis-ia.vercel.app` |
    | `EMAIL_TRANSPORT` | `smtp` |
    | `SMTP_HOST` / `SMTP_PORT` | `smtp.office365.com` / `587` |
    | `SMTP_USER` / `SMTP_PASS` | el buzón y su contraseña (de aplicación si hay MFA) |
@@ -122,7 +122,7 @@ preparado en el repo:
    con el `DATABASE_URL` de producción, y alta del primer superusuario con
    `npm run user:create`.
 4. **Hostname permitido**: `astro.config.mjs` acepta `localhost`,
-   `microdosisia.vercel.app` y el de `PUBLIC_SITE_URL`. Si el proyecto se llama
+   `microdosis-ia.vercel.app` y el de `PUBLIC_SITE_URL`. Si el proyecto se llama
    distinto o añadís un dominio propio, hay que meterlo en `hosts` **antes** de
    desplegar: sin esa entrada **todos los formularios responden 403**.
 

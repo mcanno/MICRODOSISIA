@@ -84,7 +84,7 @@ Both build paths are verifiable locally:
 
 ```bash
 npm run build                                   # Node adapter (what preview uses)
-VERCEL=1 PUBLIC_SITE_URL=https://microdosisia.vercel.app npm run build   # writes .vercel/output
+VERCEL=1 PUBLIC_SITE_URL=https://microdosis-ia.vercel.app npm run build   # writes .vercel/output
 ```
 
 Environment variables for the Vercel project (same names as `.env`):
@@ -196,7 +196,7 @@ errors, and anonymous requests to `/vote` redirect to `/login`. Run it against
   answers **403 Cross-site POST form submissions are forbidden** to every form
   in `preview`/production (Vite's `dev` server is unaffected, which is why it
   only shows up when testing the real build). The list is built at config
-  time from `localhost`, `microdosisia.vercel.app` and the hostname of
+  time from `localhost`, `microdosis-ia.vercel.app` and the hostname of
   `PUBLIC_SITE_URL` — **if the project is renamed or a custom domain is
   added, put the new hostname in `hosts`** (`astro.config.mjs`) and redeploy,
   or every form answers 403 in production.
