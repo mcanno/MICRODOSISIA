@@ -13,6 +13,13 @@ const domainError = result?.data && !result.data.ok ? result.data.error : null;
 const fields = result?.error && isInputError(result.error) ? result.error.fields : null;
 const urlError = fields?.documentationUrl?.[0];
 
+// Correcting the link of an already published microdosis
+const linkResult = Astro.getActionResult(actions.setDocumentationUrl);
+const linkOk = linkResult?.data?.ok === true;
+const linkDataError = linkResult?.data && !linkResult.data.ok ? linkResult.data.error : null;
+const linkFields = linkResult?.error && isInputError(linkResult.error) ? linkResult.error.fields : null;
+const linkFieldError = linkFields?.documentationUrl?.[0];
+
 // Adding / removing advisors
 const createResult = Astro.getActionResult(actions.createUser);
 const removeResult = Astro.getActionResult(actions.deleteUser);
@@ -33,6 +40,8 @@ const personCreated = createResult?.data?.ok === true;
 
   {domainError && <p class="notice notice-error" role="alert">{domainError}</p>}
   {urlError && <p class="notice notice-error" role="alert">{urlError}</p>}
+  {linkDataError && <p class="notice notice-error" role="alert">{linkDataError}</p>}
+  {linkOk && <p class="notice notice-ok" role="status">Enlace de documentación guardado.</p>}
 
   <ul class="list">
     {items.map((item) => {
@@ -76,13 +85,26 @@ const personCreated = createResult?.data?.ok === true;
               </button>
             </form>
           ) : (
-            <p class="meta" style="margin-top:0.9rem">
-              {item.documentationUrl ? (
-                <>Documentación: <a href={item.documentationUrl} target="_blank" rel="noopener noreferrer">{item.documentationUrl}</a></>
-              ) : (
-                "Estado final alcanzado."
-              )}
-            </p>
+            <form
+              method="POST"
+              action={actions.setDocumentationUrl}
+              style="margin-top:0.9rem; display:flex; flex-direction:column; gap:0.6rem; max-width:520px"
+            >
+              <input type="hidden" name="id" value={item.id} />
+              <label>
+                Enlace de documentación
+                <input
+                  type="url"
+                  name="documentationUrl"
+                  required
+                  placeholder="https://…  (documentos, audios, vídeos)"
+                  value={item.documentationUrl ?? ""}
+                />
+                {linkFieldError && <span class="field-error">{linkFieldError}</span>}
+                <span class="hint">Se abre con «Ver documentación ↗» en la microdosisia.</span>
+              </label>
+              <button class="btn btn-small" type="submit">Guardar enlace</button>
+            </form>
           )}
         </li>
       );

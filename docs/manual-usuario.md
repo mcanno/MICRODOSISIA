@@ -100,6 +100,9 @@ Si tu rol es **superusuario** ves **Admin** en el menú. Dentro:
   *«Pasar a «…»»*.
 - Al pasar una microdosis a **realizada** es **obligatorio** rellenar el
   **Enlace de documentación** (la validación no deja continuar sin él).
+- Si el enlace salió mal, se corrige después: en una microdosis ya
+  **realizada** verás el campo **Enlace de documentación** con el botón
+  **Guardar enlace**.
 - **Personas con acceso**: la lista de quienes pueden entrar.
   - **Dar de alta**: correo `@secot.org`, nombre y apellidos, y rol
     (**Asesor** o **Superusuario**). Eso **no envía nada**: esa persona después

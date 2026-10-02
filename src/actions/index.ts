@@ -10,6 +10,7 @@ import {
   deleteVote,
   insertMicrodosis,
   insertVote,
+  setDocumentationUrl,
   updateState,
 } from "@/lib/db/queries";
 import { isSecotEmail } from "@/lib/magic";
@@ -123,6 +124,35 @@ export const server = {
       }
 
       await updateState(item.id, input.to, needsUrl ? (input.documentationUrl ?? null) : null);
+      return { ok: true };
+    },
+  }),
+
+  /**
+   * Superuser-only correction of the documentation link of a published
+   * (`realizada`) microdosis — the transition form only shows it once, so this
+   * is how a wrong link gets fixed later. The URL stays mandatory.
+   */
+  setDocumentationUrl: defineAction({
+    accept: "form",
+    input: z.object({
+      id: z.uuid(),
+      documentationUrl: z.url("Ese enlace no es válido: tiene que empezar por https://…"),
+    }),
+    handler: async (input, context): Promise<ActionResult> => {
+      const user = context.locals.user;
+      if (!user) return { ok: false, error: "Debes iniciar sesión." };
+      if (user.role !== "superuser") {
+        return { ok: false, error: "Solo un superusuario puede cambiar la documentación." };
+      }
+
+      const item = await getMicrodosis(input.id);
+      if (!item) return { ok: false, error: "La microdosis no existe." };
+      if (item.state !== "realizada") {
+        return { ok: false, error: "El enlace se adjunta al marcar la microdosis como realizada." };
+      }
+
+      await setDocumentationUrl(item.id, input.documentationUrl);
       return { ok: true };
     },
   }),

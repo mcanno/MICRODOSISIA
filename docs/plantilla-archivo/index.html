@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  ============================================================================
+  PLANTILLA DE ESTUDIO — MICRODOSISIA
+  ============================================================================
+  Cómo usarla (lo mínimo que hay que tocar):
+
+    1. Cambiar el TÍTULO, el AUTOR y la FECHA (líneas marcadas con CAMBIAR).
+    2. Pegar en cada SECCIÓN el enlace de su carpeta (Fuentes / Informes /
+       Conclusiones). Cada botón "Abrir carpeta" lleva un href="..." ficticio.
+    3. (Opcional) Añadir enlaces sueltos a documentos destacados: copiar una
+       línea <li>...</li> y pegar el enlace del fichero
+       (OneDrive/SharePoint: fichero → Compartir → Copiar vínculo).
+    4. Guardar como index.html dentro de la carpeta del estudio y comprobar
+       que se abre haciendo clic en él desde OneDrive/SharePoint.
+
+  Los enlaces de ejemplo son FICTICIOS: buscan "PEGA AQUÍ" en este fichero.
+  ============================================================================
+-->
+<title>Estudio: título del tema — MICRODOSISIA</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --muted: #5f6368;
+    --line: #e3e3e3;
+    --brand: #0b57d0;
+    --bg: #ffffff;
+    --card: #f8f9fa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.55;
+  }
+  main { max-width: 800px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+  header.study { border-bottom: 2px solid var(--line); padding-bottom: 1.25rem; margin-bottom: 1.5rem; }
+  .eyebrow { font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 .35rem; }
+  h1 { font-size: 1.7rem; margin: 0 0 .5rem; }
+  .meta { color: var(--muted); font-size: .95rem; margin: 0; }
+  .meta span + span::before { content: " · "; }
+
+  section.block {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1.1rem 1.25rem;
+    margin: 1.25rem 0;
+  }
+  section.block h2 { font-size: 1.15rem; margin: 0 0 .25rem; }
+  .hint { font-size: .85rem; color: var(--muted); margin: 0 0 .9rem; }
+
+  .btn {
+    display: inline-block;
+    background: var(--brand);
+    color: #fff;
+    text-decoration: none;
+    font-size: .9rem;
+    padding: .45rem .9rem;
+    border-radius: 999px;
+    margin-bottom: .9rem;
+  }
+  .btn:hover { filter: brightness(1.08); }
+
+  ul.files { list-style: none; margin: 0; padding: 0; }
+  ul.files li {
+    border-top: 1px solid var(--line);
+    padding: .55rem 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem .75rem;
+    align-items: baseline;
+  }
+  ul.files li:first-child { border-top: 0; }
+  ul.files a { color: var(--brand); }
+  .tag {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 4px;
+    padding: .05rem .4rem;
+  }
+  .empty { color: var(--muted); font-style: italic; font-size: .9rem; margin: 0; }
+
+  footer.study { margin-top: 2rem; font-size: .85rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 1rem; }
+
+  @media print {
+    body { background: #fff; }
+    section.block { break-inside: avoid; background: #fff; }
+    .btn { border: 1px solid var(--brand); color: var(--brand); background: #fff; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+  <!-- CAMBIAR: cabecera del estudio -->
+  <header class="study">
+    <p class="eyebrow">Microdosisia · estudio</p>
+    <h1>Estudio: título del tema</h1>
+    <p class="meta">
+      <span>Autor o autores</span>
+      <span>02 de octubre de 2026</span>
+      <span>SECOT</span>
+    </p>
+  </header>
+
+  <!-- SECCIÓN 1 · CAMBIAR el href por el enlace de la carpeta "fuentes" -->
+  <section class="block">
+    <h2>1 · Fuentes</h2>
+    <p class="hint">Documentos, artículos y enlaces con los que se ha hecho el estudio.</p>
+    <a class="btn" target="_blank" rel="noopener"
+       href="https://PEGA-AQUI.sharepoint.com/sites/secot/Estudios/tema/fuentes">
+      Abrir carpeta de fuentes ↗
+    </a>
+    <ul class="files">
+      <!-- Opcional: enlaces sueltos a documentos destacados -->
+      <li>
+        <a target="_blank" rel="noopener" href="https://PEGA-AQUI.sharepoint.com/:t:/s/secot/XXXX">Artículo de referencia</a>
+        <span class="tag">pdf</span>
+      </li>
+      <li>
+        <a target="_blank" rel="noopener" href="https://PEGA-AQUI.sharepoint.com/:u:/s/secot/XXXX">Web consultada</a>
+        <span class="tag">enlace</span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- SECCIÓN 2 · CAMBIAR el href por el enlace de la carpeta "informes" -->
+  <section class="block">
+    <h2>2 · Informes y presentaciones</h2>
+    <p class="hint">Elaboraciones propias: informes, memorias y presentaciones.</p>
+    <a class="btn" target="_blank" rel="noopener"
+       href="https://PEGA-AQUI.sharepoint.com/sites/secot/Estudios/tema/informes">
+      Abrir carpeta de informes ↗
+    </a>
+    <ul class="files">
+      <li>
+        <a target="_blank" rel="noopener" href="https://PEGA-AQUI.sharepoint.com/:b:/s/secot/XXXX">Informe final</a>
+        <span class="tag">docx</span>
+      </li>
+      <li>
+        <a target="_blank" rel="noopener" href="https://PEGA-AQUI.sharepoint.com/:p:/s/secot/XXXX">Presentación de resultados</a>
+        <span class="tag">pptx</span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- SECCIÓN 3 · CAMBIAR el href por el enlace de la carpeta "conclusiones" -->
+  <section class="block">
+    <h2>3 · Conclusiones</h2>
+    <p class="hint">Resultados, recomendaciones y aprendizajes del estudio.</p>
+    <a class="btn" target="_blank" rel="noopener"
+       href="https://PEGA-AQUI.sharepoint.com/sites/secot/Estudios/tema/conclusiones">
+      Abrir carpeta de conclusiones ↗
+    </a>
+    <ul class="files">
+      <li>
+        <a target="_blank" rel="noopener" href="https://PEGA-AQUI.sharepoint.com/:u:/s/secot/XXXX">Resumen ejecutivo</a>
+        <span class="tag">pdf</span>
+      </li>
+      <li class="empty">— aquí se irán añadiendo los documentos de conclusiones —</li>
+    </ul>
+  </section>
+
+  <!-- CAMBIAR: pie -->
+  <footer class="study">
+    <p>Estudio elaborado para SECOT (secot.org) dentro de MICRODOSISIA. Los ficheros
+    residen en el almacenamiento de la organización; esta página solo recoge sus enlaces.</p>
+  </footer>
+
+</main>
+</body>
+</html>

@@ -204,6 +204,21 @@ export async function updateState(
   return rows[0] ?? null;
 }
 
+/**
+ * Corrects the documentation link of an already published (`realizada`)
+ * microdosis. Does not touch the state, so the DB trigger is not involved;
+ * callers must have validated the URL.
+ */
+export async function setDocumentationUrl(id: string, documentationUrl: string) {
+  const db = getDb();
+  const rows = await db
+    .update(microdosis)
+    .set({ documentationUrl, updatedAt: new Date() })
+    .where(eq(microdosis.id, id))
+    .returning();
+  return rows[0] ?? null;
+}
+
 /* ---------- votes ---------- */
 
 /** Returns `true` when the vote was created, `false` if it already existed. */

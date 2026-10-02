@@ -132,8 +132,8 @@ exactly as before) and `@astrojs/vercel` when `VERCEL=1` (see Deployment).
   are enforced a second time by a Postgres trigger installed with
   `scripts/apply-db-guard.ts`.
 - `src/actions/index.ts` — **the only place that mutates data**: add a
-  topic, vote, unvote, transition state. Each handler re-checks role and
-  transition server-side.
+  topic, vote, unvote, transition state, fix the documentation link. Each
+  handler re-checks role and transition server-side.
 - `src/lib/db/` — Drizzle schema (`schema.ts`), lazy Neon client (`index.ts`),
   queries (`queries.ts`).
 - `src/pages/` — `index`, `login`, `add`, `vote`, `microdosisia`, `admin`,
