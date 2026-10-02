@@ -1,0 +1,137 @@
+---
+import Layout from "@/components/Layout.astro";
+import { docs, renderDoc } from "@/lib/docs";
+
+const manual = renderDoc(docs.manual.source);
+const estructura = renderDoc(docs.estructura.source);
+---
+
+<Layout title="Ayuda">
+  <h1>Ayuda</h1>
+  <p class="lede">
+    Las dos guías de MICRODOSISIA: cómo usar la aplicación y cómo preparar la
+    documentación de un estudio. Se actualizan solas: el contenido sale
+    directamente de la documentación del proyecto.
+  </p>
+
+  <nav class="help-nav" aria-label="Ayuda">
+    <a class="btn btn-primary" href="#manual">Manual de usuario</a>
+    <a class="btn" href="#estructura">Estructura de un estudio</a>
+    <a class="btn" href="/ayuda/plantilla" download="index.html">Descargar plantilla</a>
+  </nav>
+
+  <section id="manual" class="doc" set:html={manual} />
+
+  <hr class="doc-rule" />
+
+  <section id="estructura" class="doc" set:html={estructura} />
+</Layout>
+
+<style is:global>
+  /* Help = Markdown rendered by src/lib/docs.ts → headings inside the page. */
+  .help-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 1.25rem 0 2rem;
+  }
+
+  .doc {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--ink);
+  }
+  .doc > h1 {
+    font-size: 1.5rem;
+    margin-top: 0;
+  }
+  .doc h2 {
+    font-size: 1.2rem;
+    margin-top: 2rem;
+    padding-top: 0.4rem;
+    border-top: 1px solid var(--line);
+  }
+  .doc h3 {
+    font-size: 1.05rem;
+    margin-top: 1.4rem;
+  }
+  .doc p,
+  .doc ul,
+  .doc ol {
+    margin: 0.7rem 0;
+  }
+  .doc li {
+    margin: 0.3rem 0;
+  }
+  .doc a {
+    color: var(--accent);
+  }
+  .doc strong {
+    font-weight: 650;
+  }
+  .doc code {
+    background: var(--neutral-bg);
+    border-radius: 4px;
+    padding: 0.1rem 0.35rem;
+    font-size: 0.9em;
+  }
+  .doc blockquote {
+    margin: 1rem 0;
+    padding: 0.6rem 1rem;
+    border-left: 4px solid var(--warn);
+    background: var(--warn-bg);
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+  .doc blockquote p {
+    margin: 0.3rem 0;
+  }
+  .doc table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  .doc th,
+  .doc td {
+    border: 1px solid var(--line);
+    padding: 0.5rem 0.7rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  .doc th {
+    background: var(--neutral-bg);
+  }
+  .doc hr {
+    border: 0;
+    border-top: 1px solid var(--line);
+    margin: 1.6rem 0;
+  }
+  .doc-rule {
+    border: 0;
+    border-top: 2px solid var(--line);
+    margin: 2.5rem 0;
+  }
+
+  @media (max-width: 640px) {
+    /* Horizontal scroll for wide tables instead of breaking the layout. */
+    .doc table {
+      display: block;
+      overflow-x: auto;
+    }
+  }
+
+  @media print {
+    .site-header,
+    .site-footer,
+    .help-nav {
+      display: none;
+    }
+    .doc h2 {
+      break-after: avoid;
+    }
+    .doc table,
+    .doc blockquote {
+      break-inside: avoid;
+    }
+  }
+</style>

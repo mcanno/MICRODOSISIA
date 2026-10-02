@@ -4,6 +4,10 @@ Microaprendizajes de IA para SECOT: propones temas, votas los que te interesan
 y consultas las microdosis ya preparadas para acompañar a las startups que
 asesoras.
 
+> Este manual y la guía de *estructura de un estudio* están también dentro de
+> la aplicación, en la pestaña **Ayuda** (menú superior), con la plantilla
+> descargable. Ahí se actualizan solas: lo que lees aquí es lo que verás allí.
+
 ---
 
 ## 1. Cómo entrar

@@ -6,7 +6,10 @@ voten y consulten microaprendizajes de IA («microdosis»).
 📖 **Manual de usuario para los asesores:** [`docs/manual-usuario.md`](docs/manual-usuario.md)
  (y la [lista de verificación](docs/verificacion-manual.md) para comprobarlo,
   los [pendientes](docs/pendientes.md), y la
-  [estructura de un estudio en el drive](docs/estructura-drive.md))
+  [estructura de un estudio en el drive](docs/estructura-drive.md)).
+ Los asesores lo leen en la pestaña **Ayuda** de la aplicación
+ («/ayuda»), que sirve estos mismos `.md` en HTML — editar este repositorio
+ y hacer `git push` basta para actualizarlo, sin tocar código de la app.
 
 ## Flujo
 

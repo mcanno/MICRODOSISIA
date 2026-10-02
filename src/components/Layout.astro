@@ -16,6 +16,7 @@ const nav: { href: string; label: string }[] = [
   { href: "/microdosisia", label: "Microdosisia" },
 ];
 if (user) nav.unshift({ href: "/add", label: "Añadir tema" });
+if (user) nav.push({ href: "/ayuda", label: "Ayuda" });
 if (user?.role === "superuser") nav.push({ href: "/admin", label: "Admin" });
 
 const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));

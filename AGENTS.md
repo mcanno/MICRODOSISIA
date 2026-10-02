@@ -137,7 +137,13 @@ exactly as before) and `@astrojs/vercel` when `VERCEL=1` (see Deployment).
 - `src/lib/db/` — Drizzle schema (`schema.ts`), lazy Neon client (`index.ts`),
   queries (`queries.ts`).
 - `src/pages/` — `index`, `login`, `add`, `vote`, `microdosisia`, `admin`,
-  plus the auth endpoints `api/login`, `api/magic` and `api/logout`.
+  `ayuda`, plus the auth endpoints `api/login`, `api/magic` and `api/logout`
+  and the template download `ayuda/plantilla.ts`.
+- `src/lib/docs.ts` — the **Ayuda** tab: imports `docs/*.md` with `?raw`,
+  rewrites repo-relative links (and drops the developer-only `Relacionado:`
+  block, which links `pendientes.md`) and renders them with `marked`. Editing
+  those Markdown files and pushing is all it takes to update the tab; never
+  copy their content into a component.
 - `src/components/Layout.astro` + `src/styles/global.css` — the whole UI.
 
 Data model: `users` (no password column; role: `member` | `superuser`),
