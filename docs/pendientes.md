@@ -3,13 +3,17 @@
 Cosas abiertas a día 01/10/2026, tras dejar la app en producción
 (<https://microdosis-ia.vercel.app>).
 
+## Estado a 02/10/2026 (retomar aquí)
+
+- ✅ Pestaña **Ayuda** desplegada (`/ayuda`, commit `7591a2a`): sirve
+  `docs/manual-usuario.md` y `docs/estructura-drive.md` en HTML + descarga de
+  la plantilla. Cambiar el manual = editar el `.md` y hacer `git push`.
+- ✅ Cuentas y microdosis de prueba borradas (02/10, por Manuel).
+- ⏳ Falta: revisión manual de la app y del manual en producción
+  (siguiente punto).
+
 ## Decisiones
 
-- [ ] **Datos de prueba en producción.** Hoy se ven en la aplicación real:
-  - cuentas `admin@secot.org` (superusuario) y `ana@secot.org` (asesor);
-  - 2 microdosis de prueba (una en *propuesta*, otra en *realizada* con su
-    enlace de documentación).
-  - Decidir si se borran o se dejan hasta que entre la gente real.
 - [ ] **Plan de Vercel.** Hobby (gratis) funciona hoy; valorar Pro si sube el
   uso. El nombre del proyecto es `microdosis-ia` — **no renombrarlo sin
   añadir el hostname nuevo a `hosts` en `astro.config.mjs`** (si no, los
